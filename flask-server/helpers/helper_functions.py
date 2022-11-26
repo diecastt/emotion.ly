@@ -1,10 +1,14 @@
 import text2emotion as te
 import requests
 import json
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-CLIENT_ID = "0ac9bed4afae4f54a89cf95f43c0542f"
-CLIENT_SECRET = "2bb61656c350462bb4a3bfb16acf3026"
-OAUTH_TOKEN = "BQDq71V54vnAkm678gpoaHOGNrZloN0WyUzd30zcOKNuSSOmtOJgvJTQ_yoXgDbxXIwY9nMFARr4kot2LfwyYqdHhIZrLmsoyNNbzjUTczoeoG3RxIreQGakGnEaCv4aCEDiAcaQnMfj8VKe3Cqyq8J3ai8xLaGzuz8OIJP-WMxd-iAc-O9hKoRTG3aEank"
+CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+OAUTH_TOKEN = os.getenv('SPOTIFY_REC_KEY')
+
 emotion_to_energy_valence = {"Angry": [-0.4, 0.79], "Fear": [-0.12, 0.79],
                              "Happy": [0.89, 0.17], "Sad": [-0.81, -0.4], "Surprise": [0.7, 0.71]}
 
@@ -24,6 +28,18 @@ def get_valence_energy(emotions):
 
     return final_point
 
+def get_genres():
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {OAUTH_TOKEN} ',
+    }
+    response = requests.get(
+        "https://api.spotify.com/v1/recommendations/available-genre-seeds", headers=headers)
+    
+    data = json.loads(response.text)
+
+    return data['genres']
 
 def get_songs(valence, energy, limit, genres):
 

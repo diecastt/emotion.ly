@@ -9,14 +9,16 @@ CORS(app)
 
 @app.route('/')
 def home():
-    return "<p>Hello, World!</p>"
+    return "<p>Hello, World! Changed the server</p>"
 
 # Text analysis route
 
-
+@app.route("/genres")
+def genres():
+    return hf.get_genres()
+    
 @app.route("/playlist")
-def getSongs():
-
+def get_songs():
     genres = request.args.get("genres").lower()
     text = request.args.get("text")
     emotion = hf.get_emotion_keywords(text)
