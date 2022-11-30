@@ -1,5 +1,7 @@
-import React from 'react'
+import React, {useState, useEffect    } from 'react'
+import _axios from 'axios';
 import { Autocomplete, TextField, Chip } from '@mui/material'
+import { env } from '../env';
 
 const genres = [
     "acoustic",
@@ -79,7 +81,7 @@ const genres = [
     "metal-misc",
     "metalcore",
     "minimal-techno",
-    "movies",
+    "movies", 
     "mpb",
     "new-age",
     "new-release",
@@ -129,24 +131,60 @@ const genres = [
     "work-out",
     "world-music"
   ]
+
+const axios = _axios.create({ baseURL: env.appServer });
+
 const Genres = () => {
-  return (
+    const [open, setOpen] = useState(false);
+    const [options, setOptions] = useState([]);
+    const loading = open && options.length === 0;
+
+    const get_genres = async () => {
+        try {
+        const data = await axios 
+            .get('/genres')
+            .then(response => response.data ? setOptions(response.data) : console.log('error'))
+        } catch(e) {
+            console.log(e)
+        }
+    };
+    useEffect(() => {
+
+        if (!loading) {
+          return undefined;
+        }
+        get_genres(); 
+    }
+    ,[loading]);
+    
+    useEffect(() => {
+
+        if (!open) {
+          setOptions([]);
+        }
+    }
+    ,[open]);
+
+    return (
     <Autocomplete
         multiple
+        limitTags={2}
         id="tags-outlined"
         options={genres}
+        loading={loading}
         getOptionLabel={(option) => option}
-        defaultValue={[genres[50]]}
         filterSelectedOptions
         renderInput={(params) => (
-          <TextField
+            <TextField
             {...params}
             label="Genres"
             placeholder="Select your genres"
-          />
+            sx={{minWidth: '35vw', pb: 4}}
+            />
         )}
-      />
-  )
+        
+        />
+    )
 }
 
 export default Genres
